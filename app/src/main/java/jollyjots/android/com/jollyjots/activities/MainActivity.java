@@ -31,7 +31,7 @@ public class MainActivity extends AppCompatActivity {
         addTaskEditText = (EditText) findViewById(R.id.activity_main_add_task_et);
         addTaskButton = (Button) findViewById(R.id.activity_main_add_button);
 
-        // TODO read from a database
+        // TODO read tasks from Shared Preferences
         adapter = TaskAdapter.loadFromData(this, getLayoutInflater());
         taskRecyclerView.setAdapter(adapter);
         taskRecyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -47,8 +47,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onSaveInstanceState(Bundle outState, PersistableBundle outPersistentState) {
         if (adapter != null) {
-            adapter.saveData(outState);
-            // todo save to database
+            // TODO save to Shared Preferences
         }
         super.onSaveInstanceState(outState, outPersistentState);
     }
