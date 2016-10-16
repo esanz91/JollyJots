@@ -109,7 +109,7 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
 
     // Caches references to the views in item layout file
     // so that resource lookups are not repeated unnecessarily.
-    public class TaskViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    public class TaskViewHolder extends RecyclerView.ViewHolder implements View.OnLongClickListener {
         // store all subviews that will be set as the row item is rendered
         private final TextView name;
         private final TextView priority;
@@ -121,8 +121,7 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
 
             name = (TextView) itemView.findViewById(R.id.item_todo_row_name);
             priority = (TextView) itemView.findViewById(R.id.item_todo_row_priority);
-
-            itemView.setOnClickListener(this);
+            itemView.setOnLongClickListener(this);
         }
 
         public void bind(final int position) {
@@ -133,12 +132,14 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
         }
 
         @Override
-        public void onClick(View view) {
+        public boolean onLongClick(View view) {
             int position = getAdapterPosition(); // gets item position
 
             if (position != RecyclerView.NO_POSITION) { // Check if an item was deleted, but the user clicked it before the UI removed it
                 removeTask(position);
             }
+            return true;
         }
+
     }
 }
