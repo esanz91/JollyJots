@@ -1,7 +1,7 @@
 package jollyjots.android.com.jollyjots.activities;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.os.PersistableBundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -9,13 +9,13 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
+import com.google.gson.Gson;
+
 import jollyjots.android.com.jollyjots.R;
 import jollyjots.android.com.jollyjots.adapters.TaskAdapter;
 import jollyjots.android.com.jollyjots.models.Task;
 
 public class MainActivity extends AppCompatActivity {
-
-    private final static String TASKS_PREF = "TASKS_PREF";
 
     RecyclerView taskRecyclerView;
     TaskAdapter adapter;
@@ -31,7 +31,6 @@ public class MainActivity extends AppCompatActivity {
         addTaskEditText = (EditText) findViewById(R.id.activity_main_add_task_et);
         addTaskButton = (Button) findViewById(R.id.activity_main_add_button);
 
-        // TODO read tasks from Shared Preferences
         adapter = TaskAdapter.loadFromData(this, getLayoutInflater());
         taskRecyclerView.setAdapter(adapter);
         taskRecyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -45,11 +44,26 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    public void onSaveInstanceState(Bundle outState, PersistableBundle outPersistentState) {
+    protected void onStop() {
         if (adapter != null) {
-            // TODO save to Shared Preferences
+            // get SharedPreference Editor
+            SharedPreferences pref = getSharedPreferences(getString(R.string.TASKS_PREF), MODE_PRIVATE);
+            SharedPreferences.Editor editor = pref.edit();
+
+            // save size of list
+            int taskCount = adapter.getItemCount();
+            editor.putInt(getString(R.string.TASKS_PREF_SIZE), taskCount);
+
+            // save each task object as json
+            Gson gson = new Gson();
+            for (int i = 0; i < taskCount; i++) {
+                Task task = adapter.getTask(i);
+                String taskJson = gson.toJson(task);
+                editor.putString(getString(R.string.TASK_JSON) + i, taskJson);
+            }
+            editor.apply();
         }
-        super.onSaveInstanceState(outState, outPersistentState);
+        super.onStop();
     }
 
     @Override
@@ -63,7 +77,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void onAddItem() {
         String input = addTaskEditText.getText().toString();
-        if(input.length() < 1){
+        if (input.length() < 1) {
             return;
         }
         adapter.addTask(new Task(input));

@@ -1,5 +1,11 @@
 <resources>
+
     <string name="app_name">JollyJots</string>
     <string name="activity_main_hint">Enter a new item</string>
     <string name="add_task_action">Add Task</string>
+
+    <string name="TASKS_PREF">TASKS_PREF</string>
+    <string name="TASKS_PREF_SIZE">TASKS_PREF_SIZE</string>
+    <string name="TASK_JSON">TASK_JSON</string>
+
 </resources>

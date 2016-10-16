@@ -3,12 +3,13 @@ package jollyjots.android.com.jollyjots.adapters;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+
+import com.google.gson.Gson;
 
 import java.util.ArrayList;
 
@@ -17,7 +18,6 @@ import jollyjots.android.com.jollyjots.models.Task;
 
 // TaskAdapter binds data to item views (that are displayed within the RecyclerView)
 public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder> {
-    private final static String TASKS_PREF = "TASKS_PREF";
 
     private final ArrayList<Task> tasks = new ArrayList<>();
     private final LayoutInflater inflater;
@@ -53,18 +53,39 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
     }
 
     // load data from System Preferences
-    public static TaskAdapter loadFromData(@Nullable final Context context,
+    public static TaskAdapter loadFromData(@NonNull final Context context,
                                            @NonNull final LayoutInflater layoutInflater) {
-        SharedPreferences pref = context.getSharedPreferences("MyPref", 0);
+
+        final String TASKS_PREF = context.getString(R.string.TASKS_PREF);
+        final String TASKS_PREF_SIZE = context.getString(R.string.TASKS_PREF_SIZE);
+        final String TASK_JSON = context.getString(R.string.TASK_JSON);
+
+        SharedPreferences pref = context.getSharedPreferences(TASKS_PREF, Context.MODE_PRIVATE);
+
         if (pref != null) {
-            // TODO read tasks from Shared Preferences
-            final ArrayList<Task> tasks = null;
-            if (tasks != null) {
-                return new TaskAdapter(layoutInflater, tasks);
+            // get size
+            int taskListSize = pref.getInt(TASKS_PREF_SIZE, 0);
+
+            // add tasks to new list
+            final ArrayList<Task> taskList = new ArrayList<>();
+            Gson gson = new Gson();
+            for (int i = 0; i < taskListSize; i++) {
+                String taskJson = pref.getString(TASK_JSON + i, "");
+                Task task = gson.fromJson(taskJson, Task.class);
+                taskList.add(task);
+            }
+
+            // return new task adapter
+            if (taskList != null) {
+                return new TaskAdapter(layoutInflater, taskList);
             }
         }
 
         return new TaskAdapter(layoutInflater);
+    }
+
+    public Task getTask(final int position) {
+        return tasks.get(position);
     }
 
     public void addTask(@NonNull final Task task) {
